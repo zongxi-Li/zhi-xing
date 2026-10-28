@@ -1,7 +1,7 @@
 # PR-HANDS-01 ｜ ZhiYi Hands 可信用户态执行基线
 
 **日期**: 2026-10-28 ｜ **基线**: PR-HANDS-00（16/16）
-**工作区**: `C:\Users\LZX\Desktop\zhiyi Hands\hands-p0\`（隔离，无 git，不提交不推送）
+**工作区**: `C:\Users\LZX\Desktop\zhiyi Hands\`（隔离，无 git，不提交不推送）
 **知弈主仓库**: `C:\Users\LZX\Desktop\kinlin_ai` — **本预研零修改、零接入**。注：验证时点该仓库存在未提交修改（`.config/env/windows.example`、`.gitignore`、`apps/agent/Dockerfile` 等），为用户自身的 S03 开发活动（PR-HANDS-00 验证时点为干净），与本预研无关。
 **上游**: deepseek-ai/deepseek-harness @ `22ddee3792402c3e70ec5f86a63c3e3e895a2f60`（MIT）
 

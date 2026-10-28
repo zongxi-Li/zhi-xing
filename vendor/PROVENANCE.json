@@ -1,0 +1,451 @@
+{
+ "upstream": "deepseek-ai/deepseek-harness",
+ "upstream_commit": "22ddee3792402c3e70ec5f86a63c3e3e895a2f60",
+ "upstream_license": "MIT (copy at vendor/LICENSE)",
+ "layout_note": "upstream packages/<group>/<pkg>/src reproduced verbatim under vendor/packages/<group>/<pkg>-src/src; layout only, zero content edits",
+ "stubs_owned_by_hands": [
+  "packages/stubs/session-src (type-only SessionId)",
+  "packages/stubs/sandbox-policy-src (policy service shape)",
+  "packages/stubs/dsh-skill-src (constant + skill type shapes for the optional diagnosis skill)",
+  "packages/llm/llm-src/index.ts (trimmed re-export; error.ts is verbatim)"
+ ],
+ "vendored_ts_files": 87,
+ "verbatim_identical": 87,
+ "files": [
+  {
+   "file": "cordis-src/src/context.ts",
+   "sha256": "96b388162d6013c1",
+   "verbatim": true
+  },
+  {
+   "file": "cordis-src/src/events.ts",
+   "sha256": "9aff93dcfcad98ae",
+   "verbatim": true
+  },
+  {
+   "file": "cordis-src/src/fiber.ts",
+   "sha256": "c0728ad4fac2c19a",
+   "verbatim": true
+  },
+  {
+   "file": "cordis-src/src/index.ts",
+   "sha256": "071fb226e9a21556",
+   "verbatim": true
+  },
+  {
+   "file": "cordis-src/src/logger.ts",
+   "sha256": "05cb6be3e4cf8d07",
+   "verbatim": true
+  },
+  {
+   "file": "cordis-src/src/reflect.ts",
+   "sha256": "6847b9781044023d",
+   "verbatim": true
+  },
+  {
+   "file": "cordis-src/src/registry.ts",
+   "sha256": "34bbd60ae502b4f8",
+   "verbatim": true
+  },
+  {
+   "file": "cordis-src/src/service.ts",
+   "sha256": "614205c6ce7cf1a0",
+   "verbatim": true
+  },
+  {
+   "file": "cordis-src/src/utils.ts",
+   "sha256": "8fe273424583d212",
+   "verbatim": true
+  },
+  {
+   "file": "cosmokit-src/src/array.ts",
+   "sha256": "cf4de899ecffd66a",
+   "verbatim": true
+  },
+  {
+   "file": "cosmokit-src/src/index.ts",
+   "sha256": "1087da74b9c46198",
+   "verbatim": true
+  },
+  {
+   "file": "cosmokit-src/src/misc.ts",
+   "sha256": "117617943074ea57",
+   "verbatim": true
+  },
+  {
+   "file": "cosmokit-src/src/string.ts",
+   "sha256": "5564272b3e15e492",
+   "verbatim": true
+  },
+  {
+   "file": "cosmokit-src/src/time.ts",
+   "sha256": "49957c4608465a1f",
+   "verbatim": true
+  },
+  {
+   "file": "cosmokit-src/src/types.ts",
+   "sha256": "cc49c12e4a637f7b",
+   "verbatim": true
+  },
+  {
+   "file": "cosmokit-src/src/volatile.ts",
+   "sha256": "937433215595f89d",
+   "verbatim": true
+  },
+  {
+   "file": "schemastery-src/src/index.ts",
+   "sha256": "a6647b515659cf43",
+   "verbatim": true
+  },
+  {
+   "file": "packages/fs/fs-src/src/index.ts",
+   "sha256": "bb3e351a975fde0f",
+   "verbatim": true
+  },
+  {
+   "file": "packages/fs/fs-src/src/types.ts",
+   "sha256": "5918ac1953e92aae",
+   "verbatim": true
+  },
+  {
+   "file": "packages/fs/fs-local-src/src/fsio.ts",
+   "sha256": "afbc5cb2d6e9b98b",
+   "verbatim": true
+  },
+  {
+   "file": "packages/fs/fs-local-src/src/index.ts",
+   "sha256": "12ea487a15f16b22",
+   "verbatim": true
+  },
+  {
+   "file": "packages/fs/fs-local-src/src/win32.ts",
+   "sha256": "2fa3696f3c852a32",
+   "verbatim": true
+  },
+  {
+   "file": "packages/fs/fs-sandbox-src/src/containment.ts",
+   "sha256": "36dd20f6c63bb6a2",
+   "verbatim": true
+  },
+  {
+   "file": "packages/fs/fs-sandbox-src/src/index.ts",
+   "sha256": "449b45690b07ddac",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/subprocess-src/src/control.ts",
+   "sha256": "50db21bb7ca66c69",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/subprocess-src/src/index.ts",
+   "sha256": "19e3fde571d0cd1f",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/subprocess-src/src/types.ts",
+   "sha256": "e65166444ff79199",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/subprocess-local-src/src/bin.ts",
+   "sha256": "2f4ed2f5b9a08d8b",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/subprocess-local-src/src/control-spawn.ts",
+   "sha256": "cefa514393081def",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/subprocess-local-src/src/index.ts",
+   "sha256": "0839baefcbc7562a",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/subprocess-local-src/src/linux-execve.ts",
+   "sha256": "0b6857c340fc4f43",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/subprocess-local-src/src/linux-scope-selector.ts",
+   "sha256": "198c568df54f13f6",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/subprocess-local-src/src/linux-scope.ts",
+   "sha256": "45bf7868740f9dc3",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/subprocess-local-src/src/managed-owner.ts",
+   "sha256": "c8153bbb1093f2ed",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/subprocess-local-src/src/output.ts",
+   "sha256": "1151a91d7bc31ffc",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/subprocess-local-src/src/process-inspector.ts",
+   "sha256": "1e4ca66f18c2118c",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/subprocess-local-src/src/runner-launch.ts",
+   "sha256": "5cac2782d724a120",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/subprocess-local-src/src/runner-protocol.ts",
+   "sha256": "0ada1f271cede3a0",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/subprocess-local-src/src/shell-activity.ts",
+   "sha256": "86c0fadc2f61d245",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/subprocess-local-src/src/spawn-runner.ts",
+   "sha256": "d4ba8aeec4427437",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/subprocess-local-src/src/spawn.ts",
+   "sha256": "1087f9ed17041678",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/subprocess-local-src/src/terminal.ts",
+   "sha256": "ab720272e6a3583c",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/subprocess-local-src/src/windows-inspector.ts",
+   "sha256": "b11489dba93ec374",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/subprocess-local-src/src/windows-job.ts",
+   "sha256": "220d210e72df9da2",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/win32-process-src/src/abi.ts",
+   "sha256": "02983fd084440c86",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/win32-process-src/src/control-stdio.ts",
+   "sha256": "8870419b7d48e58a",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/win32-process-src/src/errors.ts",
+   "sha256": "e0e7377a376ab5c1",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/win32-process-src/src/ffi.ts",
+   "sha256": "988331864f460138",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/win32-process-src/src/index.ts",
+   "sha256": "ef120e78e18da1f0",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/win32-process-src/src/koffi.ts",
+   "sha256": "13aa290917b63681",
+   "verbatim": true
+  },
+  {
+   "file": "packages/subprocess/win32-process-src/src/process.ts",
+   "sha256": "2043f59d97f320f8",
+   "verbatim": true
+  },
+  {
+   "file": "packages/sandbox/sandbox-src/src/diagnostics.ts",
+   "sha256": "758d86ef3e565f53",
+   "verbatim": true
+  },
+  {
+   "file": "packages/sandbox/sandbox-src/src/escalation.ts",
+   "sha256": "880b6e61be017679",
+   "verbatim": true
+  },
+  {
+   "file": "packages/sandbox/sandbox-src/src/index.ts",
+   "sha256": "0a44c9d691a20006",
+   "verbatim": true
+  },
+  {
+   "file": "packages/sandbox/sandbox-src/src/locales.ts",
+   "sha256": "1b71bf44c86a5516",
+   "verbatim": true
+  },
+  {
+   "file": "packages/sandbox/sandbox-src/src/roots.ts",
+   "sha256": "96efb4b8386d429a",
+   "verbatim": true
+  },
+  {
+   "file": "packages/sandbox/sandbox-local-src/src/index.ts",
+   "sha256": "a7a531c067547da0",
+   "verbatim": true
+  },
+  {
+   "file": "packages/sandbox/sandbox-local-src/src/profiles.ts",
+   "sha256": "1bd2770b2947db51",
+   "verbatim": true
+  },
+  {
+   "file": "packages/sandbox/sandbox-windows-acl-src/src/acl-skill.ts",
+   "sha256": "a04e2f6433a039d5",
+   "verbatim": true
+  },
+  {
+   "file": "packages/sandbox/sandbox-windows-acl-src/src/acl.ts",
+   "sha256": "42376a7c79b7aa30",
+   "verbatim": true
+  },
+  {
+   "file": "packages/sandbox/sandbox-windows-acl-src/src/ffi.ts",
+   "sha256": "9e90ba38afee2107",
+   "verbatim": true
+  },
+  {
+   "file": "packages/sandbox/sandbox-windows-acl-src/src/grant.ts",
+   "sha256": "2d23a95f2f362970",
+   "verbatim": true
+  },
+  {
+   "file": "packages/sandbox/sandbox-windows-acl-src/src/index.ts",
+   "sha256": "d279f21d9e09d70e",
+   "verbatim": true
+  },
+  {
+   "file": "packages/sandbox/sandbox-windows-acl-src/src/path-boundary.ts",
+   "sha256": "42f3b93dd357bebd",
+   "verbatim": true
+  },
+  {
+   "file": "packages/sandbox/sandbox-windows-acl-src/src/runner.ts",
+   "sha256": "542b77278d974f5f",
+   "verbatim": true
+  },
+  {
+   "file": "packages/sandbox/sandbox-windows-acl-src/src/spawn.ts",
+   "sha256": "a72479eb80e2c8bb",
+   "verbatim": true
+  },
+  {
+   "file": "packages/sandbox/sandbox-windows-acl-src/src/token.ts",
+   "sha256": "33eb75161384ef2b",
+   "verbatim": true
+  },
+  {
+   "file": "packages/sandbox/sandbox-windows-acl-src/src/win32-abi.ts",
+   "sha256": "054c85c9703014d9",
+   "verbatim": true
+  },
+  {
+   "file": "packages/sandbox/sandbox-windows-acl-src/src/workspace-sid.ts",
+   "sha256": "7332eef52a304789",
+   "verbatim": true
+  },
+  {
+   "file": "packages/shell/shell-src/src/index.ts",
+   "sha256": "2f4612974ca1cbce",
+   "verbatim": true
+  },
+  {
+   "file": "packages/shell/shell-src/src/render.ts",
+   "sha256": "e3c156942bce5b74",
+   "verbatim": true
+  },
+  {
+   "file": "packages/shell/shell-src/src/types.ts",
+   "sha256": "32a710e1000dae0a",
+   "verbatim": true
+  },
+  {
+   "file": "packages/shell/pwsh-local-src/src/index.ts",
+   "sha256": "feebf120ba9c2759",
+   "verbatim": true
+  },
+  {
+   "file": "packages/shell/pwsh-local-src/src/resolve.ts",
+   "sha256": "5c832a5a3cd94473",
+   "verbatim": true
+  },
+  {
+   "file": "packages/shell/pwsh-sandbox-src/src/helpers.ts",
+   "sha256": "14d2e4d19f622eea",
+   "verbatim": true
+  },
+  {
+   "file": "packages/shell/pwsh-sandbox-src/src/index.ts",
+   "sha256": "4bb0357149f229f5",
+   "verbatim": true
+  },
+  {
+   "file": "packages/shell/bash-local-src/src/index.ts",
+   "sha256": "03f7d8c0a6162aec",
+   "verbatim": true
+  },
+  {
+   "file": "packages/util/timeout-src/src/index.ts",
+   "sha256": "cadc1aea5b85854f",
+   "verbatim": true
+  },
+  {
+   "file": "packages/util/lazy-require-src/src/index.ts",
+   "sha256": "3453ea694b03c110",
+   "verbatim": true
+  },
+  {
+   "file": "packages/util/http-proxy-src/src/index.ts",
+   "sha256": "065a1154dd85977e",
+   "verbatim": true
+  },
+  {
+   "file": "packages/util/http-proxy-src/src/install.ts",
+   "sha256": "acf606d8cdbee736",
+   "verbatim": true
+  },
+  {
+   "file": "packages/util/http-proxy-src/src/policy.ts",
+   "sha256": "4827eabf9fac4402",
+   "verbatim": true
+  },
+  {
+   "file": "packages/util/brand-src/src/index.ts",
+   "sha256": "f9d6da858d730811",
+   "verbatim": true
+  },
+  {
+   "file": "packages/util/values-src/src/index.ts",
+   "sha256": "b550a5db58f71419",
+   "verbatim": true
+  },
+  {
+   "file": "packages/util/values-src/src/partial-json.ts",
+   "sha256": "d06228f26e0c670d",
+   "verbatim": true
+  },
+  {
+   "file": "packages/native/entry-src/src/flock.ts",
+   "sha256": "1e13f45a3d627f43",
+   "verbatim": true
+  },
+  {
+   "file": "packages/native/entry-src/src/index.ts",
+   "sha256": "d0c67bea62d4922d",
+   "verbatim": true
+  }
+ ]
+}

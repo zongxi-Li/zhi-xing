@@ -1,5 +1,5 @@
 // quick: run one shell exec through the engine with error printing
-process.chdir('C:/Users/LZX/Desktop/zhiyi Hands/hands-p0')
+process.chdir('C:/Users/LZX/Desktop/zhiyi Hands')
 const { createStandaloneHands } = await import('../hands/index.ts')
 const { mkdtempSync } = await import('node:fs')
 const { tmpdir } = await import('node:os')

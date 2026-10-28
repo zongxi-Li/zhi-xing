@@ -11,10 +11,10 @@
 
 ## 一、结论摘要
 
-1. **提取可行且已验证**：DSH 的执行基座（fs / subprocess / win32-process / sandbox / shell 五组共 16 个子包）与 Agent Loop、Session、LLM 在源码级解耦。以"**保留最小 Cordis 运行容器 + tsconfig paths 源码直用**"方案，Hands-P0 已在本机（Windows 11, Node 24.19）跑通全部六项验收，**16/16 测试通过**（`hands-p0/tests/p0.spec.ts`），全程无 LLM、无第二 Planner/ACG/WorkflowRuntime、未触碰知弈主线。
+1. **提取可行且已验证**：DSH 的执行基座（fs / subprocess / win32-process / sandbox / shell 五组共 16 个子包）与 Agent Loop、Session、LLM 在源码级解耦。以"**保留最小 Cordis 运行容器 + tsconfig paths 源码直用**"方案，Hands-P0 已在本机（Windows 11, Node 24.19）跑通全部六项验收，**16/16 测试通过**（`tests/p0.spec.ts`），全程无 LLM、无第二 Planner/ACG/WorkflowRuntime、未触碰知弈主线。
 2. **三种提取方案比较结论**：保留最小 Cordis（已采用，成本最低、保真度最高）> 直接提取（需重写 `Service`/`inject`/`ctx.effect` 语义，约 150+ 行容器替代品，风险在中）> 自行适配（仅作 fallback，本次未触发）。Cordis 本身是 DSH vendored 的 MIT IoC 容器（`vendor/cordis/`，Koishi 衍生），不携带任何 Agent 基础设施。
 3. **知弈侧合同已对齐**：知弈已有版本化执行信封 `LocalRuntimeExecutionRequest/Result/Event`（`apps/agentOS/src/contracts/local_runtime.py:51/90/112`），Hands 协议 v"1" 逐字段镜像该家族；`docs/开发记录/PR-EX-00-执行后端架构审计与设计.md` 正是 Hands 的同构先导设计（其 §8 明确把 "DSH" 列为未来执行后端，`contracts/resource.py:62-71` RuntimeKind.EXECUTION_BACKEND 同）。
-4. **一项重要安全发现（VERIFIED）**：Microsoft Store 版 pwsh（MSIX 别名）的孙进程会**逃逸** Windows Job 整树终止；原生 PowerShell 5.1 无此问题。已留存复现证据与缓解方案（`hands-p0/evidence/tree-kill-store-pwsh-escape.md`）。
+4. **一项重要安全发现（VERIFIED）**：Microsoft Store 版 pwsh（MSIX 别名）的孙进程会**逃逸** Windows Job 整树终止；原生 PowerShell 5.1 无此问题。已留存复现证据与缓解方案（`evidence/tree-kill-store-pwsh-escape.md`）。
 
 ---
 
@@ -62,7 +62,7 @@ DSH 是三层能力体系，全部构建在 vendored Cordis IoC 容器上：
 
 | 组件 | 来源 | 许可证 | 复用方式 | 声明义务 | 升级成本 |
 |---|---|---|---|---|---|
-| fs/fs, fs-local, fs-sandbox | DSH @22ddee37 | **MIT** | 逐字 vendor（`hands-p0/vendor/packages/fs/*`，仅恢复 src/ 层级） | 保留版权与许可声明（`vendor/LICENSE`） | 低：上游 rebase 后 diff vendor 子集；面窄（三包 API 稳定） |
+| fs/fs, fs-local, fs-sandbox | DSH @22ddee37 | **MIT** | 逐字 vendor（`vendor/packages/fs/*`，仅恢复 src/ 层级） | 保留版权与许可声明（`vendor/LICENSE`） | 低：上游 rebase 后 diff vendor 子集；面窄（三包 API 稳定） |
 | subprocess, subprocess-local, win32-process | 同上 | MIT | 逐字 vendor | 同上 | 中：runner IPC 协议（runner-protocol.ts）若变需同步 |
 | sandbox（词汇+roots） | 同上 | MIT | 逐字 vendor | 同上 | 低 |
 | shell/shell, pwsh-local, bash-local | 同上 | MIT | 逐字 vendor | 同上 | 低 |
@@ -117,14 +117,14 @@ DSH 是三层能力体系，全部构建在 vendored Cordis IoC 容器上：
 
 - **P0（已验证）**：Job Object kill-on-close 整树终止（`CreateProcessW(CREATE_SUSPENDED)` → `AssignProcessToJobObject` → `ResumeThread`，win32-process/src/process.ts:415-520）；runner 崩溃/被杀时 kill-on-close 兜底；`waitForExit` 以 **Job 空为止**（windows-job.ts:160-177），故收据返回即孙进程已亡——本机实测验证（原生 5.1 下）。
 - **安全假设边界（诚实声明）**：fs 写围栏是**可信代码内的策略检查，不是内核边界**（fs-sandbox/src/index.ts:10-18 自注）；本机实测 `writableRoots` 恒含 OS 临时目录（roots.ts:97-100），逃逸探针必须避开临时目录。本轮**不对任何隔离机制做安全保证**。
-- **发现并记录的机制冲突（VERIFIED）**：Store 版 pwsh 孙进程逃逸 Job（详见 `hands-p0/evidence/tree-kill-store-pwsh-escape.md`）——列入"需要重新验证的安全假设"；缓解：装配层强制原生可执行（`shellExecutablePath` 已预留）。
+- **发现并记录的机制冲突（VERIFIED）**：Store 版 pwsh 孙进程逃逸 Job（详见 `evidence/tree-kill-store-pwsh-escape.md`）——列入"需要重新验证的安全假设"；缓解：装配层强制原生可执行（`shellExecutablePath` 已预留）。
 - **Provider 路线**：P1 = DSH sandbox-windows-acl（限制令牌+能力 SID，`enforcement:'partial'` 自报）作为 SandboxProvider；P2 = 远程 World（同一接口，argv 换 remote launcher，与 DSH bwrap runner 同构）；远期 = Linux/QEMU 教学内核 Provider（接口无需改动，`confine()`/spawn 语义已抽象）。本轮均未实现未运行。
 
 ---
 
 ## 五、Hands-P0 样机与测试证据
 
-**位置**: `hands-p0/`（运行方式见其 README.md）
+**位置**: `./`（运行方式见其 README.md）
 
 | P0 目标 | 结果 | 证据 |
 |---|---|---|
@@ -180,8 +180,8 @@ DSH 是三层能力体系，全部构建在 vendored Cordis IoC 容器上：
 |---|---|
 | DSH 模块与依赖分析（含 file:line） | 本报告 §2（三份审计原始数据已并入） |
 | 复用与许可证矩阵 | 本报告 §3 |
-| 目标架构与接口草案 | 本报告 §4 + `hands-p0/hands/{protocol,grants,providers,world,engine}.ts`（可运行形态） |
-| Hands-P0 样机 | `hands-p0/`（README 有运行方式） |
-| 自动化测试与失败证据 | `hands-p0/tests/p0.spec.ts`（16 通过）、`hands-p0/evidence/`（日志 + tree-kill 发现 + 诊断脚本） |
+| 目标架构与接口草案 | 本报告 §4 + `hands/{protocol,grants,providers,world,engine}.ts`（可运行形态） |
+| Hands-P0 样机 | `./`（README 有运行方式） |
+| 自动化测试与失败证据 | `tests/p0.spec.ts`（16 通过）、`evidence/`（日志 + tree-kill 发现 + 诊断脚本） |
 | S03 集成依赖清单 | 本报告 §6 |
 | 下一阶段建议 | 本报告 §7 |
