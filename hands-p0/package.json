@@ -1,0 +1,36 @@
+{
+  "name": "@zhiyi/hands-p0",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "ZhiYi Hands P0: standalone execution engine prototype extracted from DeepSeek Harness (MIT). Research workspace — not for production, not part of the ZhiYi main line.",
+  "engines": {
+    "node": ">=24.9.0"
+  },
+  "scripts": {
+    "demo": "tsx hands/cli.ts demo",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "chokidar": "5.0.0",
+    "koffi": "3.1.1",
+    "undici": "8.11.2",
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@standard-schema/spec": "^1.0.0",
+    "@types/node": "^24.0.0",
+    "node-pty": "1.2.0-beta.15",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^3.0.0"
+  },
+  "pnpm": {
+    "//": "koffi's install script verifies its Win32 FFI prebuilt (required for the Windows Job-Object path). node-pty is deliberately NOT allowed: P0 imports its types only and never loads the native module.",
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "koffi"
+    ]
+  }
+}

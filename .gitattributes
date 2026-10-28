@@ -1,0 +1,5 @@
+# Disable all end-of-line conversion for every file.
+# hands-p0/vendor holds 100% verbatim extractions from upstream sources
+# (see hands-p0/vendor/PROVENANCE.json); byte-for-byte identity must survive
+# checkout on any machine, independent of local core.autocrlf settings.
+* -text

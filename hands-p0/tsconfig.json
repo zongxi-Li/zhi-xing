@@ -1,0 +1,121 @@
+{
+  "//": "Hands-P0 root project. Self-contained compilerOptions + paths relative to this file. Strictness mirrors DSH upstream: the vendored cordis container compiles upstream with noImplicitAny/noImplicitThis/strictFunctionTypes/noUncheckedIndexedAccess/exactOptionalPropertyTypes/noImplicitOverride/noUnusedLocals/noUnusedParameters disabled (DSH vendor/cordis/tsconfig.json), so this project uses the same shape - strict core (strictNullChecks etc.) stays on.",
+  "compilerOptions": {
+    "target": "es2024",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
+    "verbatimModuleSyntax": false,
+    "strict": true,
+    "types": [
+      "node"
+    ],
+    "noEmit": true,
+    "noImplicitAny": false,
+    "noImplicitThis": false,
+    "strictFunctionTypes": false,
+    "noUncheckedIndexedAccess": false,
+    "exactOptionalPropertyTypes": false,
+    "noImplicitOverride": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "paths": {
+      "@deepseek-ai/cordis": [
+        "./vendor/cordis-src/src/index.ts"
+      ],
+      "@deepseek-ai/cosmokit": [
+        "./vendor/cosmokit-src/src/index.ts"
+      ],
+      "@deepseek-ai/schemastery": [
+        "./vendor/schemastery-src/src/index.ts"
+      ],
+      "@deepseek-ai/dsh-fs": [
+        "./vendor/packages/fs/fs-src/src/index.ts"
+      ],
+      "@deepseek-ai/dsh-fs-local": [
+        "./vendor/packages/fs/fs-local-src/src/index.ts"
+      ],
+      "@deepseek-ai/dsh-fs-sandbox": [
+        "./vendor/packages/fs/fs-sandbox-src/src/index.ts"
+      ],
+      "@deepseek-ai/dsh-subprocess": [
+        "./vendor/packages/subprocess/subprocess-src/src/index.ts"
+      ],
+      "@deepseek-ai/dsh-subprocess/control": [
+        "./vendor/packages/subprocess/subprocess-src/src/control.ts"
+      ],
+      "@deepseek-ai/dsh-subprocess-local": [
+        "./vendor/packages/subprocess/subprocess-local-src/src/index.ts"
+      ],
+      "@deepseek-ai/dsh-win32-process": [
+        "./vendor/packages/subprocess/win32-process-src/src/index.ts"
+      ],
+      "@deepseek-ai/dsh-sandbox": [
+        "./vendor/packages/sandbox/sandbox-src/src/index.ts"
+      ],
+      "@deepseek-ai/dsh-shell": [
+        "./vendor/packages/shell/shell-src/src/index.ts"
+      ],
+      "@deepseek-ai/dsh-pwsh-local": [
+        "./vendor/packages/shell/pwsh-local-src/src/index.ts"
+      ],
+      "@deepseek-ai/dsh-bash-local": [
+        "./vendor/packages/shell/bash-local-src/src/index.ts"
+      ],
+      "@deepseek-ai/dsh-timeout": [
+        "./vendor/packages/util/timeout-src/src/index.ts"
+      ],
+      "@deepseek-ai/dsh-lazy-require": [
+        "./vendor/packages/util/lazy-require-src/src/index.ts"
+      ],
+      "@deepseek-ai/dsh-http-proxy": [
+        "./vendor/packages/util/http-proxy-src/src/index.ts"
+      ],
+      "@deepseek-ai/dsh-brand": [
+        "./vendor/packages/util/brand-src/src/index.ts"
+      ],
+      "@deepseek-ai/dsh-util-values": [
+        "./vendor/packages/util/values-src/src/index.ts"
+      ],
+      "@deepseek-ai/dsh-llm": [
+        "./vendor/packages/llm/llm-src/src/index.ts"
+      ],
+      "@deepseek-ai/dsh-session": [
+        "./vendor/packages/stubs/session-src/src/index.ts"
+      ],
+      "@deepseek-ai/dsh-sandbox-policy": [
+        "./vendor/packages/stubs/sandbox-policy-src/src/index.ts"
+      ],
+      "@deepseek-ai/node-addon-system/landlock-run": [
+        "./vendor/packages/native/entry-src/src/index.ts"
+      ],
+      "@deepseek-ai/dsh-sandbox-local": [
+        "./vendor/packages/sandbox/sandbox-local-src/src/index.ts"
+      ],
+      "@deepseek-ai/dsh-sandbox-windows-acl": [
+        "./vendor/packages/sandbox/sandbox-windows-acl-src/src/index.ts"
+      ],
+      "@deepseek-ai/dsh-pwsh-sandbox": [
+        "./vendor/packages/shell/pwsh-sandbox-src/src/index.ts"
+      ],
+      "@deepseek-ai/dsh-skill": [
+        "./vendor/packages/stubs/dsh-skill-src/index.ts"
+      ]
+    }
+  },
+  "include": [
+    "hands/**/*.ts",
+    "tests/**/*.ts",
+    "vitest.config.ts"
+  ],
+  "//exclude-note": "Vendored DSH/cordis sources are typechecked by their upstream project under their own tsconfig; here they are verified behaviorally (tests run them via tsx). Keeping them in this strict project would surface upstream-inherited style errors, not Hands errors.",
+  "exclude": [
+    "vendor/packages/**/tests/**",
+    "**/*.spec.ts",
+    "**/*.e2e.ts",
+    "vendor/packages/subprocess/subprocess-local-src/src/linux-*.ts"
+  ]
+}

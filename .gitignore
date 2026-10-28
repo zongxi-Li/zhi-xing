@@ -1,0 +1,16 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# logs & transient output
+*.log
+*.tmp
+
+# OS artifacts
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# editor
+.idea/
+.vscode/
