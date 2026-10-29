@@ -10,7 +10,8 @@
   "scripts": {
     "demo": "tsx hands/cli.ts demo",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "vitest run"
+    "test": "vitest run",
+    "run:exec": "tsx hands/cli.ts exec"
   },
   "dependencies": {
     "chokidar": "5.0.0",

@@ -64,6 +64,16 @@ export class HandsGrantRegistry {
     return true
   }
 
+  /**
+   * Install a trusted record verbatim under its existing id. Used by the
+   * service layer to mirror a server-side admission into the engine's
+   * defense-in-depth check; the id always originates from the trusted store,
+   * never from client input. Re-installing overwrites (admission-time refresh).
+   */
+  install(grant: HandsGrant): void {
+    this.#grants.set(grant.grantId, { ...grant, allowedCapabilities: new Set(grant.allowedCapabilities) })
+  }
+
   get(grantId: string): HandsGrant | undefined {
     return this.#grants.get(grantId)
   }
