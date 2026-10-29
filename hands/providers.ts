@@ -114,6 +114,22 @@ export interface HandsExecutionIdentity {
   jobContainment: 'windows-job' | 'native-fallback'
 }
 
+/** Non-consuming offset reader over one captured stream (adapter over DSH's). */
+export interface HandsOffsetReader {
+  readFrom(offsetByte: number): { text: string; next: number; lossy?: boolean }
+}
+
+/** Optional live-read surface of a started handle (absent on providers without it). */
+export interface HandsObservedStreams {
+  stdout?: HandsOffsetReader
+  stderr?: HandsOffsetReader
+}
+
+/** Incremental output observation hooks (the service event stream uses these). */
+export interface HandsExecutionHooks {
+  onOutput?(channel: 'stdout' | 'stderr', text: string): void
+}
+
 export interface HandsProcessHandle {
   /** OS pid of the direct child when known. */
   pid: number | null
@@ -121,6 +137,8 @@ export interface HandsProcessHandle {
   kill(): boolean
   /** Settles with the full result; never rejects. */
   wait(): Promise<HandsProcessResult>
+  /** Live offset readers when the provider supports incremental capture. */
+  observed?: HandsObservedStreams
 }
 
 /**

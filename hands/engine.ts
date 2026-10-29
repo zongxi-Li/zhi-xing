@@ -9,6 +9,8 @@
  */
 
 import { createHash } from 'node:crypto'
+import { existsSync, realpathSync } from 'node:fs'
+import * as pathModule from 'node:path'
 import {
   canonicalChecksum,
   HANDS_ERROR_CODES,
@@ -23,7 +25,7 @@ import {
   type HandsReceiptStatus,
 } from './protocol.ts'
 import { authorizeGrant, HandsAuthorizationError, type HandsGrantRegistry } from './grants.ts'
-import type { HandsWorld } from './providers.ts'
+import type { HandsExecutionHooks, HandsProcessResult, HandsWorld } from './providers.ts'
 
 export interface HandsEngineOptions {
   world: HandsWorld
@@ -66,7 +68,7 @@ export class HandsEngine {
     this.#now = options.now ?? (() => new Date())
   }
 
-  async execute(request: HandsExecutionRequest, callerSignal?: AbortSignal): Promise<HandsExecutionReceipt> {
+  async execute(request: HandsExecutionRequest, callerSignal?: AbortSignal, hooks?: HandsExecutionHooks): Promise<HandsExecutionReceipt> {
     const startedAt = this.#now().toISOString()
     const base: {
       protocolVersion: string
@@ -122,7 +124,7 @@ export class HandsEngine {
     }
 
     try {
-      const output = await this.#dispatch(request.capabilityId, request.input, limits, controller.signal)
+      const output = await this.#dispatch(request.capabilityId, request.input, limits, controller.signal, hooks)
       const aborted = (output as { __aborted?: boolean }).__aborted === true
       delete (output as { __aborted?: boolean }).__aborted
       if (aborted) {
@@ -153,6 +155,7 @@ export class HandsEngine {
     input: Record<string, unknown>,
     limits: { timeoutMs: number; stdoutMaxBytes: number; stderrMaxBytes: number },
     signal: AbortSignal,
+    hooks?: HandsExecutionHooks,
   ): Promise<Record<string, unknown>> {
     switch (capabilityId) {
       case 'fs.read':
@@ -161,7 +164,7 @@ export class HandsEngine {
       case 'fs.patch':
         return this.#dispatchFs(capabilityId, input, signal)
       case 'shell.exec':
-        return this.#dispatchShell(input, limits, signal)
+        return this.#dispatchShell(input, limits, signal, hooks)
     }
   }
 
@@ -203,8 +206,12 @@ export class HandsEngine {
     input: Record<string, unknown>,
     limits: { timeoutMs: number; stdoutMaxBytes: number; stderrMaxBytes: number },
     signal: AbortSignal,
+    hooks?: HandsExecutionHooks,
   ): Promise<Record<string, unknown>> {
     const { command, workdir } = requireInput<ShellExecInput>(input, ['command'])
+    if (workdir !== undefined) {
+      assertWorkdirInsideWorkspace(workdir, this.#world.filesystem.workspaceRoot)
+    }
     const spec: Parameters<HandsWorld['process']['run']>[0] = {
       command,
       timeoutMs: limits.timeoutMs,
@@ -212,7 +219,9 @@ export class HandsEngine {
       signal,
     }
     if (workdir !== undefined) spec.workdir = workdir
-    const result = await this.#world.process.run(spec)
+    const result: HandsProcessResult = hooks?.onOutput !== undefined
+      ? await this.#runObserved(spec, limits.timeoutMs, hooks)
+      : await this.#world.process.run(spec)
     const identity = this.#world.process.identity
     return {
       exitCode: result.exitCode,
@@ -227,6 +236,57 @@ export class HandsEngine {
       // Sentinel consumed by execute(): a caller-aborted kill is a CANCELLED receipt.
       __aborted: result.aborted,
     }
+  }
+
+  /**
+   * Streaming variant over provider.start(): the engine owns the deadline
+   * (background handles arm no executor deadline), polls the non-consuming
+   * observed readers, and classifies the first cause itself — executor
+   * `timedOut` is a foreground-only fact. Non-hooked callers keep the
+   * foreground path and DSH's native first-cause classification untouched.
+   */
+  async #runObserved(
+    spec: Parameters<HandsWorld['process']['run']>[0],
+    timeoutMs: number,
+    hooks: HandsExecutionHooks,
+  ): Promise<HandsProcessResult> {
+    const handle = await this.#world.process.start({ ...spec, timeoutMs: undefined })
+    let timedOut = false
+    const timer = setTimeout(() => {
+      timedOut = true
+      handle.kill()
+    }, timeoutMs)
+    let settled: HandsProcessResult | undefined
+    const done = handle.wait().then((result) => {
+      settled = result
+      return result
+    })
+    let stdoutOffset = 0
+    let stderrOffset = 0
+    const pump = (channel: 'stdout' | 'stderr'): void => {
+      const reader = handle.observed?.[channel]
+      if (reader === undefined) return
+      const read = reader.readFrom(channel === 'stdout' ? stdoutOffset : stderrOffset)
+      if (channel === 'stdout') stdoutOffset = read.next
+      else stderrOffset = read.next
+      if (read.text !== '') hooks.onOutput?.(channel, read.text)
+    }
+    try {
+      while (settled === undefined) {
+        pump('stdout')
+        pump('stderr')
+        await Promise.race([done, delay(50)])
+      }
+      pump('stdout')
+      pump('stderr')
+    } finally {
+      clearTimeout(timer)
+    }
+    const result = settled!
+    // First-cause classification in the engine-owned-deadline path.
+    if (timedOut) return { ...result, timedOut: true, aborted: false }
+    if (spec.signal?.aborted === true) return { ...result, timedOut: false, aborted: true }
+    return result
   }
 
   #seal(
@@ -306,3 +366,36 @@ function isFsAborted(error: unknown): boolean {
 
 /** sha256 helper re-exported so tests can verify receipts without importing protocol directly. */
 export const sha256Hex = (value: string): string => createHash('sha256').update(value, 'utf8').digest('hex')
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+/**
+ * Workspace boundary for shell workdirs: an absolute/relative workdir must
+ * canonicalize INSIDE the world's workspace root (junction/symlink ancestors
+ * are resolved through the nearest existing ancestor's realpath).
+ */
+function assertWorkdirInsideWorkspace(workdir: string, workspaceRoot: string): void {
+  const { isAbsolute, join, dirname, resolve, sep } = pathModule
+  const absolute = isAbsolute(workdir) ? resolve(workdir) : resolve(join(workspaceRoot, workdir))
+  // Walk up to the nearest EXISTING ancestor; stop at a non-existent root
+  // (dirname of a root is itself) — realpath then reports the honest ENOENT.
+  let probe = absolute
+  while (!existsSync(probe)) {
+    const parent = dirname(probe)
+    if (parent === probe) break
+    probe = parent
+  }
+  const canonicalProbe = realpathSync(probe)
+  const canonicalRoot = realpathSync(workspaceRoot)
+  const normalizedProbe = process.platform === 'win32' ? canonicalProbe.toLowerCase() : canonicalProbe
+  const normalizedRoot = (process.platform === 'win32' ? canonicalRoot.toLowerCase() : canonicalRoot) + sep
+  const inside = normalizedProbe === normalizedRoot.slice(0, -1) || normalizedProbe.startsWith(normalizedRoot)
+  if (!inside) {
+    throw new HandsProtocolError(
+      HANDS_ERROR_CODES.WORKDIR_OUT_OF_WORKSPACE,
+      `workdir "${workdir}" resolves outside the workspace root`,
+    )
+  }
+}

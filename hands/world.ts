@@ -46,6 +46,7 @@ import { SandboxPwshExecutor } from '@deepseek-ai/dsh-pwsh-sandbox'
 import { resolveShellExecutable, type ShellExecutableIdentity } from './shell-policy.ts'
 import type {
   HandsCapturedStream,
+  HandsObservedStreams,
   HandsDirEntry,
   HandsEditOutcome,
   HandsEditRequest,
@@ -229,10 +230,15 @@ class DshShellProcessProvider implements HandsProcessProvider {
 
   async start(spec: HandsProcessSpec): Promise<HandsProcessHandle> {
     const execution = await this.executor.execute(this.#resolveSpec(spec, true))
+    const observed: HandsObservedStreams = {
+      stdout: { readFrom: (offset) => mapRead(execution.observed.stdout.readFrom(offset)) },
+      stderr: { readFrom: (offset) => mapRead(execution.observed.stderr.readFrom(offset)) },
+    }
     return {
       pid: null,
       kill: () => execution.kill(),
       wait: async () => toHandsResult(await execution.result()),
+      observed,
     }
   }
 
@@ -264,6 +270,14 @@ function toHandsResult(result: ShellRunResult): HandsProcessResult {
         ...(result.sandbox.enforcement === undefined ? {} : { enforcement: result.sandbox.enforcement }),
         ...(result.sandbox.runnerFailed === undefined ? {} : { runnerFailed: result.sandbox.runnerFailed }),
       }
+  // Supplementary denial classification for zh-CN Windows: DSH's English
+  // signatures miss localized OS denial text. This only enriches the `denied`
+  // FLAG — the isolation fact itself is the OS-level effect (files not
+  // created), never this string match.
+  const localizedDenial = sandbox !== undefined
+    && !sandbox.denied
+    && /访问被拒绝|拒绝访问/.test(`${result.stdout.text}${result.stderr.text}`)
+  const enrichedSandbox = sandbox === undefined ? undefined : (localizedDenial ? { ...sandbox, denied: true } : sandbox)
   const handsResult: HandsProcessResult = {
     exitCode: result.exitCode,
     signal: result.signal,
@@ -271,9 +285,15 @@ function toHandsResult(result: ShellRunResult): HandsProcessResult {
     aborted: result.aborted,
     stdout: toHandsStream(result.stdout),
     stderr: toHandsStream(result.stderr),
+    ...(enrichedSandbox === undefined ? {} : { sandbox: enrichedSandbox }),
   }
-  if (sandbox !== undefined) handsResult.sandbox = sandbox
   return handsResult
+}
+
+type DshStreamRead = { text: string; nextOffset: number; lossy: boolean; spillPath?: string }
+
+function mapRead(read: DshStreamRead): { text: string; next: number; lossy?: boolean } {
+  return { text: read.text, next: read.nextOffset, ...(read.lossy ? { lossy: true } : {}) }
 }
 
 function toHandsStream(output: CollectedOutput): HandsCapturedStream {
